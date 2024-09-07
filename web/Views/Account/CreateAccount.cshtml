@@ -1,0 +1,42 @@
+﻿@model Presentation.DataTransferObject.RegisterUserModel;
+
+@{
+    ViewData["Title"] = "Create Account";
+    Layout = "~/Views/Shared/_LoginLayout.cshtml";
+}
+
+<div class="main-container">
+    <div class="login-container" style="height: 350px">
+        <div class="main-heading">
+            <span>Create Account</span>
+        </div>
+
+        <div class="create-input-container" style="height: 300px">
+            @using (Html.BeginForm("CreateAccount", "Account", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+
+                <div class="input-group">
+                    @Html.TextBoxFor(x => x.FirstName, new { @class = "form-control", @placeholder = "First Name", @required = "required", @autocomplete = "off", @autofill = "false", @type = "text" })
+                </div>
+
+                <div class="input-group">
+                    @Html.TextBoxFor(x => x.LastName, new { @class = "form-control", @placeholder = "Last Name", @required = "required", @autocomplete = "off", @autofill = "false", @type = "text" })
+                </div>
+
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                    @Html.TextBoxFor(x => x.Email, new { @class = "form-control", @placeholder = "Email", @required = "required", @autocomplete = "off", @autofill = "false", @type = "email" })
+                </div>
+
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+                    @Html.PasswordFor(x => x.Password, new { @class = "form-control", @placeholder = "Password", @required = "required", @autocomplete = "off", @autofill = "false" })
+                </div>
+
+                <div class="input-group" style="margin-top: 2px; display: flex; justify-content: end;">
+                    <input type="submit" class="btn btn-primary" value="Create" />
+                </div>
+            }
+        </div>
+    </div>
+</div>

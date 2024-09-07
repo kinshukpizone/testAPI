@@ -1,0 +1,35 @@
+﻿@model Presentation.DataTransferObject.LoginUserModel;
+
+@{
+    ViewData["Title"] = "Sign in";
+    Layout = "~/Views/Shared/_LoginLayout.cshtml";
+}
+
+<div class="main-container">
+    <div class="login-container">
+        <div class="main-heading">
+            <span>Sign in</span>
+        </div>
+
+        <div class="login-input-container">
+            @using (Html.BeginForm("SignIn", "Account", FormMethod.Post))
+            {
+
+                <div class="input-group" style="width: 300px">
+                    <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                    @Html.TextBoxFor(x => x.Email, new { @class = "form-control", @placeholder = "Email", @required = "required", @autocomplete = "off", @autofill = "false", @type = "email" })
+                </div>
+
+                <div class="input-group" style="margin-top: 20px; width: 300px;">
+                    <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+                    @Html.PasswordFor(x => x.Password, new { @class = "form-control", @placeholder = "Password", @required = "required", @autocomplete = "off", @autofill = "false" })
+                </div>
+
+                <div style="margin-top: 20px; display: flex; justify-content: end;">
+                    <a class="btn btn-success mr-2" href="@Url.Action("CreateAccount", "Account")" target="_self">Create</a>
+                    <input type="submit" class="btn btn-primary" value="Login" />
+                </div>
+            }
+        </div>
+    </div>
+</div>

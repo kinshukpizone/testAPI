@@ -1,0 +1,245 @@
+﻿
+<style>
+    #example {
+        border: 1px solid #dddddd;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+</style>
+
+<div class="container p-5">
+    <div class="col-12 mt-2 mb-2">
+        <div class="row">
+            <div class="col-2">
+                <button id="add" class="btn btn-outline-primary">Add State</button>
+            </div>
+            <div class="col-8">
+            </div>
+            <div class="col-2">
+                <p class="badge bg-success" id="add_update_message"></p>
+            </div>
+        </div>
+    </div>
+    <table id="example" class="table table-striped table-bordered dt-responsive nowrap" width="100%" cellspacing="0" style="width:100%">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>State Name</th>
+                <th>Edit</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+        <tfoot>
+            <tr>
+                <th>Id</th>
+                <th>State Name</th>
+                <th>Edit</th>
+                <th>Delete</th>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+<div id="add_popup" class="modal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New State</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="col-md-12">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label class="text-primary text-right" for="stateName">State Name</label>
+                        </div>
+                        <div class="col-md-9">
+                            <input class="form-control" type="text" id="stateName" placeholder="Enter state name" />
+                            <div style="height: 30px">
+                                <p class="text-danger" id="add_error_message"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="closeModal" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button id="addNewState" type="button" class="btn btn-primary">Add</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--======================== UPDATE MODAL ========================= -->
+<div id="update_popup" class="modal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit State</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="col-md-12">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label class="text-primary text-right" for="stateName">State Name</label>
+                        </div>
+                        <div class="col-md-9">
+                            <input class="form-control" type="text" id="stateNameForUpdate" placeholder="Enter state name" />
+                            <div style="height: 30px">
+                                <p class="text-danger" id="update_error_message"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="closeModal1" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button id="updateNewState" type="button" class="btn btn-primary" value="" onclick="updateNewState(this)">Update</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+
+    <script>
+        $('document').ready(function () {
+            console.clear();
+            $('#example').dataTable({
+                "processing": true,
+                "serverSide": true,
+                "filter": false,
+                "orderMulti": false,
+                "bPaginate": true,
+                "bLengthChange": false,
+                "bFilter": true,
+                "bInfo": true,
+                "bAutoWidth": false,
+                "pageLength": 10,
+                "ajax": {
+                    "url": "/State/Get/",
+                    "type": "GET",
+                    "datatype": "json"
+                },
+                "columns": [
+                    { "data": "id", "width": "30%" },
+                    { "data": "stateName", "width": "40%" },
+                    {
+                        "data": "id", "width": "15%", render: function (data, type, row, meta) {
+                            return ('<button class="btn btn-success" onclick="updateState(this)" value="' + data + '">Edit</button>')
+                        }
+                    },
+                    {
+                        "data": "id", "width": "15%", render: function (data, type, row, meta) {
+                            return ('<button class="btn btn-danger" onclick="deleteState(this)" value="' + data + '">Delete</button>')
+                        }
+                    },
+                ]
+            });
+
+            $('#add').click(function () {
+                $('#add_popup').modal('show');
+            });
+
+            $('#addNewState').click(function () {
+                var newState = $('#stateName').val();
+                $.ajax({
+                    url: '/State/Create/?stateName=' + newState,
+                    type: "POST",
+                    success: function (response) {
+                        if (response.success) {
+                            $('#stateName').val("");
+                            $('#closeModal').click();
+                            $('#example').DataTable().ajax.reload();
+                        } else {
+                            $('#add_error_message').text(response.error);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                    }
+                });
+            });
+
+            
+        });
+
+        function updateNewState(element) {
+            var newState = $('#stateNameForUpdate').val();
+            console.log('/State/Update/?stateid=' + element.value + '&stateName=' + newState);
+            $.ajax({
+                url: '/State/Update/?stateid=' + element.value + '&stateName=' + newState,
+                type: "PUT",
+                success: function (response) {
+                    if (response.success) {
+                        $('#stateNameForUpdate').val("");
+                        $('#closeModal1').click();
+
+                        $('#add_update_message').removeClass('badge bg-danger');
+                        $('#add_update_message').addClass('badge bg-success');
+                        $('#add_update_message').text("State successfully updated!");
+
+                        $('#example').DataTable().ajax.reload();
+                    } else {
+                        $('#add_error_message').text(response.error);
+                    }
+                },
+                error: function (xhr, status, error) {
+                }
+            });
+        }
+
+        function updateState(element) {
+            $.ajax({
+                url: '/State/GetById/?stateid=' + element.value,
+                type: "GET",
+                success: function (response) {
+                    if (response.success) {
+                        
+                        $('#stateNameForUpdate').val(response.data.stateName)
+                        $('#updateNewState').val(element.value)
+                        $('#update_popup').modal('show');
+                    } else {
+                        $('#add_update_message').removeClass('badge bg-success');
+                        $('#add_update_message').addClass('badge bg-danger');
+                        $('#add_update_message').text(response.error);
+                    }
+
+                    setTimeout(() => {
+                        $('#add_update_message').text('');
+                    }, 3000);
+                },
+                error: function (xhr, status, error) {
+                }
+            });
+        }
+
+        function deleteState(element) {
+            $.ajax({
+                url: '/State/Delete/?stateid=' + element.value,
+                type: "DELETE",
+                success: function (response) {
+                    if (response.success) {
+                        $('#example').DataTable().ajax.reload();
+                        $('#add_update_message').removeClass('badge bg-danger');
+                        $('#add_update_message').addClass('badge bg-success');
+                        $('#add_update_message').text("State successfully deleted!");
+                    } else {
+                        $('#add_update_message').removeClass('badge bg-success');
+                        $('#add_update_message').addClass('badge bg-danger');
+                        $('#add_update_message').text(response.error);
+                    }
+
+                    setTimeout(() => {
+                        $('#add_update_message').text('');
+                    }, 3000);
+                },
+                error: function (xhr, status, error) {
+                }
+            });
+        }
+
+    </script>
+}
